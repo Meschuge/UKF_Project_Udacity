@@ -4,6 +4,7 @@
 
 //#include "render/render.h"
 #include "highway.h"
+#include <numeric>
 
 int main(int argc, char** argv)
 {
@@ -39,5 +40,8 @@ int main(int argc, char** argv)
 		time_us = 1000000*frame_count/frame_per_sec;
 		
 	}
-
+	for(auto car : highway.traffic) {
+        std::cout << "NIS Laser: " <<  std::accumulate(car.ukf.nis_laser.begin(), car.ukf.nis_laser.end(), 0.0)/car.ukf.nis_laser.size() << std::endl;
+        std::cout << "NIS Radar: " <<  std::accumulate(car.ukf.nis_radar.begin(), car.ukf.nis_radar.end(), 0.0)/car.ukf.nis_laser.size() << std::endl;
+    }
 }
