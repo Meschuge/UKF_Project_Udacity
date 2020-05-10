@@ -26,8 +26,8 @@ public:
 	bool visualize_radar = true;
 	bool visualize_pcd = false;
 	// Predict path in the future using UKF
-	double projectedTime = 0;
-	int projectedSteps = 0;
+	double projectedTime = 2;
+	int projectedSteps = 6;
 	// --------------------------------
 
 	Highway(pcl::visualization::PCLVisualizer::Ptr& viewer)
@@ -122,15 +122,15 @@ public:
 		for (int i = 0; i < traffic.size(); i++)
 		{
 			traffic[i].move((double)1/frame_per_sec, timestamp);
-			if(!visualize_pcd)
-				traffic[i].render(viewer);
-			// Sense surrounding cars with lidar and radar
-			if(trackCars[i])
+            if(!visualize_pcd)
+                traffic[i].render(viewer);
+            // Sense surrounding cars with lidar and radar
+            if(trackCars[i])
 			{
-				VectorXd gt(4);
-				gt << traffic[i].position.x, traffic[i].position.y, traffic[i].velocity*cos(traffic[i].angle), traffic[i].velocity*sin(traffic[i].angle);
-				tools.ground_truth.push_back(gt);
-				tools.lidarSense(traffic[i], viewer, timestamp, visualize_lidar);
+                VectorXd gt(4);
+                gt << traffic[i].position.x, traffic[i].position.y, traffic[i].velocity*cos(traffic[i].angle), traffic[i].velocity*sin(traffic[i].angle);
+                tools.ground_truth.push_back(gt);
+                tools.lidarSense(traffic[i], viewer, timestamp, visualize_lidar);
 				tools.radarSense(traffic[i], egoCar, viewer, timestamp, visualize_radar);
 				tools.ukfResults(traffic[i],viewer, projectedTime, projectedSteps);
 				VectorXd estimate(4);
@@ -140,7 +140,6 @@ public:
     			double v2 = sin(yaw)*v;
 				estimate << traffic[i].ukf.x_[0], traffic[i].ukf.x_[1], v1, v2;
 				tools.estimations.push_back(estimate);
-	
 			}
 		}
 		viewer->addText("Accuracy - RMSE:", 30, 300, 20, 1, 1, 1, "rmse");

@@ -20,9 +20,8 @@ double Tools::noise(double stddev, long long seedNum)
 lmarker Tools::lidarSense(Car& car, pcl::visualization::PCLVisualizer::Ptr& viewer, long long timestamp, bool visualize)
 {
 	MeasurementPackage meas_package;
-	meas_package.sensor_type_ = MeasurementPackage::LASER;
   	meas_package.raw_measurements_ = VectorXd(2);
-
+    meas_package.sensor_ = new LidarSensor();
 	lmarker marker = lmarker(car.position.x + noise(0.15,timestamp), car.position.y + noise(0.15,timestamp+1));
 	if(visualize)
 		viewer->addSphere(pcl::PointXYZ(marker.x,marker.y,3.0),0.5, 1, 0, 0,car.name+"_lmarker");
@@ -50,9 +49,9 @@ rmarker Tools::radarSense(Car& car, Car ego, pcl::visualization::PCLVisualizer::
 	}
 	
 	MeasurementPackage meas_package;
-	meas_package.sensor_type_ = MeasurementPackage::RADAR;
     meas_package.raw_measurements_ = VectorXd(3);
     meas_package.raw_measurements_ << marker.rho, marker.phi, marker.rho_dot;
+    meas_package.sensor_ = new RadarSensor();
     meas_package.timestamp_ = timestamp;
 
     car.ukf.ProcessMeasurement(meas_package);
